@@ -1,4 +1,4 @@
-## Example express server showing how private embed with programmatic filtering works
+## Example express server demonstrating private embed with programmatic filtering
 
 ### Installation
 
@@ -12,13 +12,12 @@
 
 2. Embed the card or dashboard using the 'Private' Embed option.
 
-3. In the root of the repository run yarn to install the necessary dependencies.
+3. In the base folder of the repository run yarn to install the necessary dependencies.
    ```
-   # cd programmatic-filtering-example-using-xhr-master
    # yarn
    ```
 
-4. Create a file in the root of the project named .env
+4. Create a file in the base folder of the project named .env
 
 5. Inside of this file add the following configuration settings but using your own values:
    ```
@@ -37,7 +36,7 @@
    The EMBED_TYPE must be either the word 'dashboard' or 'card' (without the quotes).
    Include the USE_XHR setting only if cookie based authentication won't work for then endpoint you create on your server. 
 
-6. Start the express server like this in the root of the project
+6. Start the express server like this in the base folder of the project
    ```
    # yarn start
    ```
