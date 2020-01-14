@@ -31,10 +31,10 @@
    ```
  
    The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
-   For more information about creating the CLIENT_ID and CLIENT_SECRET see https://developer.domo.com/docs/authentication/overview-4.
-   The EMBED_ID represents the public or private identifier for either the card or the dashboard depending on what you are embedding.
-   The EMBED_TYPE must be either the word 'dashboard' or 'card' (without the quotes).
-   Include the USE_XHR setting only if cookie based authentication won't work for then endpoint you create on your server. 
+   For more information about creating the CLIENT_ID and CLIENT_SECRET see https://developer.domo.com/docs/authentication/overview-4.  
+   The EMBED_ID references the card or the dashboard you are embedding.  
+   The EMBED_TYPE must be either the word 'dashboard' or 'card' (without the quotes).  
+   Include the USE_XHR setting only if cookie based authentication won't work for the endpoint you create on your server.  
 
 6. Start the express server like this in the base folder of the project
    ```
