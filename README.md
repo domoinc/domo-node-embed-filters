@@ -28,13 +28,18 @@
 
 6. Inside of this file add the following configuration settings but using your own values:
    ```
-   CLIENT_ID=e2c2f94D-2472-4Ec5-bfb7-0ff22207a5ba
-   CLIENT_SECRET=9a6a04b8f65ab3f26e1f8ce812dc55071619cea90a34874a06d09675c43beeee
-   EMBED_ID=bMV5b
+   CLIENT_ID=YOUR_CLIENT_ID
+   CLIENT_SECRET=YOUR_CLIENT_SECRET
+   EMBED_ID=YOUR_EMBED_ID
    EMBED_TYPE=dashboard
 
    # optional settings
    USE_XHR=true
+   # these settings are used for optional additional embedded cards that appear on the sample page
+   EMBED_ID2=YOUR_EMBED_ID
+   EMBED_ID3=YOUR_EMBED_ID
+   EMBED_ID4=YOUR_EMBED_ID
+   EMBED_ID5=YOUR_EMBED_ID
    ```
  
    The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
@@ -51,3 +56,5 @@
 8. In your browser go to the url localhost:3001 and verify that you are able to see you the card or dashboard appearing there after you login. The available usernames to login with are listed in the express.js file and they are as follows: mike, susan, tom and rachael. The password is not verified and so any will work.
 
 9. Once you have verified your card or dashboard is showing up in the example site, open up the file users.js in a text editor and modify the filter settings for each user to customize the filtering that each user will have applied to them. Currently each user has an empty filter being applied to them "[]". There are some example filters in the file that are commented out that you can use that give you an idea of the format expected for the filters. Once you make filter changes to the users.js file, you will need to save the file, restart the express server, refresh the page, and then log back in to see your filter changes. The complete list of available operators for use in filters are as follows: "IN", "NOT_IN", "EQUALS", "NOT_EQUALS", "GREATER_THAN", "GREAT_THAN_EQUALS_TO", "LESS_THAN", "LESS_THAN_EQUALS_TO".
+
+10. For information on how the javascript api works to both send and receive messages from Domo embedded iframes see the jsapi.js file. To test out the api you can apply a filter to all of the cards by using the forms at the top of the page. You can also click on the charts and see how the code in the jsapi.js file uses events sent from the iframe to route the iframe to a different url including the filters as part of the new url.

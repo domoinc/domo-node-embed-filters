@@ -107,7 +107,7 @@ function getAccessToken(req, res, next, config) {
 
 function secondsSinceEpoch(){ return Math.floor( Date.now() / 1000 ) }
 
-function returnEmbedInfo(res, config) {
+function returnEmbedInfo(req, res, config) {
   console.log('returning embed info');
   if (process.env.USE_XHR) {
     res.send(`{"embedToken": "${config.embedToken}", "embedUrl": "${EMBED_URL}${config.embedId}"}`);
@@ -115,7 +115,7 @@ function returnEmbedInfo(res, config) {
     res.send(`
   <html>
     <body>
-      <form id="form" action="${EMBED_URL}${config.embedId}" method="post">
+      <form id="form" action="${EMBED_URL}${config.embedId}?referenceId=${req.params.itemId}" method="post">
         <input type="hidden" name="embedToken" value='${config.embedToken}'>
       </form>
       <script>
@@ -128,8 +128,24 @@ function returnEmbedInfo(res, config) {
 
 function handleRequest(req, res, next, config) {
   getEmbedToken(req, res, next, config).then(() => {
-    returnEmbedInfo(res, config);
+    returnEmbedInfo(req, res, config);
   });
+}
+
+function showFilters(req, res) {
+  const query = req.query;
+  console.log(`query = `, query);
+  let message = `Transitioning content based on mouse click for the following filter:<br><br>`;
+      message += `column: ${req.query.column}<br>operand: ${req.query.operand}<br>values: ${req.query.values}<br><br>`
+  res.send(`
+  <html>
+    <body>
+      <div style="margin: 20px; font-size: 24px; line-height: 30px;">
+        ${message}
+      </div>
+    </body>
+  </html>
+  `);
 }
 
 function refreshEmbedToken(req, res, next, config) {
@@ -139,4 +155,5 @@ function refreshEmbedToken(req, res, next, config) {
 module.exports = {
   handleRequest,
   refreshEmbedToken,
+  showFilters,
 }

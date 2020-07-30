@@ -69,8 +69,17 @@ if (!process.env.EMBED_ID || !process.env.CLIENT_ID || !process.env.CLIENT_SECRE
   return;
 }
 
-app.get('/embed/item/1', passport.authenticationMiddleware(), (req, res, next) => {
-  embed.handleRequest(req, res, next, req.user.config.visualization1);
+app.get('/embed/items/:itemId', passport.authenticationMiddleware(), (req, res, next) => {
+  const config = req.user.config['visualization'+req.params.itemId];
+  if (config.embedId) {
+    embed.handleRequest(req, res, next, req.user.config['visualization'+req.params.itemId]);
+  } else {
+    next(Error(`The EMBED_ID${req.params.itemId} environment variable in your .env file was not set. Please check the your .env.`));
+  }
+});
+
+app.get('/embed/page', passport.authenticationMiddleware(), (req, res, next) => {
+  embed.showFilters(req, res);
 });
 
 app.get('/', (req, res) => {

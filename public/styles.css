@@ -51,11 +51,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   width: 100vw;
   height: 100vh;
   color: #455A64;
-  /* background-color: #7E57C2; */
   background-color: #3498db;
   font-family: var(--fontFamily);
   font-size: var(--fontSizeMd);
