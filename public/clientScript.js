@@ -37,6 +37,6 @@ function transferFailed(evt) {
 var oReq = new XMLHttpRequest();
 oReq.addEventListener("load", reqListener);
 oReq.addEventListener("error", transferFailed);
-oReq.open("GET", "/embed/item/1");
+oReq.open("GET", "/embed/items/1");
 oReq.setRequestHeader('authToken', 'importAuthTokenExample-239842alvanv98arkfjsd9a8hb')
 oReq.send();
