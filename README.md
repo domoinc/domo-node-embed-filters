@@ -35,11 +35,6 @@
 
    # optional settings
    USE_XHR=true
-   # these settings are used for optional additional embedded cards that appear on the sample page
-   EMBED_ID2=YOUR_EMBED_ID
-   EMBED_ID3=YOUR_EMBED_ID
-   EMBED_ID4=YOUR_EMBED_ID
-   EMBED_ID5=YOUR_EMBED_ID
    ```
  
    The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.

@@ -9,18 +9,27 @@ window.addEventListener("message", e => {
     console.log(`referenceId = ${referenceId}`);
     const port = e.ports[0];
 
+    port.start();
+
     const onPortMessage = e => {
         console.log('received message on port', e);
         console.log(`referenceId = ${referenceId}`);
     
-        if (e.data.params) {
-            console.log('received rpc event message');
-            const embedId = e.data.params['embedId'];
-            const filters = e.data.params['filters'];
-            console.log(`embedId = ${embedId}`);
-            console.log(`filters = `, filters);
-            const iframe = document.querySelector(`#iframe${referenceId}`);
-            iframe.src = `/embed/page?column=${filters[0].column}&operand=${filters[0].operand}&values=${filters[0].values.join()}`
+        
+        if (e.data.method) {
+            console.log(`received rpc event message ${e.data.method}`);
+            switch(e.data.method) {
+                case '/v1/onDrill':
+                    const filters = e.data.params['filters'];
+                    console.log(`filters = `, filters);
+                    const iframe = document.querySelector(`#iframe${referenceId}`);
+                    iframe.src = `/embed/page?column=${filters[0].column}&operand=${filters[0].operand}&values=${filters[0].values.join()}`;
+                    break;
+                case '/v1/onFrameSizeChange':
+                    console.log(`width = ${e.data.params['width']}`);
+                    console.log(`height = ${e.data.params['height']}`);
+                    break;
+            }
         }
     
         if (e.data.hasOwnProperty('result')) {
@@ -52,13 +61,17 @@ const applyFilters = (filters = []) => {
 
 const form_submit = function(event) {
     event.preventDefault();
-    const column = document.querySelector("#column_input").value;
-    const value = document.querySelector("#value_input").value;
+    const columnElem = document.querySelector("#column_input");
+    const valueElem = document.querySelector("#value_input");
+    const column = columnElem.value;
+    const value = valueElem.value;
     if (!column && !value) {
         applyFilters();
     } else {
-        applyFilters([{"column": column, "operator": "IN", "values": [value]}]);
+        applyFilters([{"column": column, "operand": "IN", "values": [value]}]);
     }
+    columnElem.value = '';
+    valueElem.value = '';
 }
 
 const reset_form = function() {
