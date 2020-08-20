@@ -18,6 +18,9 @@ module.exports = [
         },
         visualization5: {
           clientId: process.env.CLIENT_ID, clientSecret: process.env.CLIENT_SECRET, embedId: process.env.EMBED_ID5,
+        },
+        visualization6: {
+          clientId: process.env.CLIENT_ID, clientSecret: process.env.CLIENT_SECRET, embedId: process.env.EMBED_ID6,
         } 
       }
     },

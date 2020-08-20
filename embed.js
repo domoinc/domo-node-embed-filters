@@ -135,15 +135,20 @@ function handleRequest(req, res, next, config) {
 function showFilters(req, res) {
   const query = req.query;
   console.log(`query = `, query);
-  let message = `Transitioning content based on mouse click for the following filter:<br><br>`;
-      message += `column: ${req.query.column}<br>operand: ${req.query.operand}<br>values: ${req.query.values}<br><br>`
+  let message = `Transitioning content based on mouse click for the following filter:`;
   res.send(`
   <html>
     <body>
       <div style="margin: 20px; font-size: 24px; line-height: 30px;">
         ${message}
+        <pre id="filters" style="line-height: 20px; font-size: 16px; color: lightslategrey; "></pre>
       </div>
     </body>
+    <script>
+      const filters = ${req.query.filters};
+      const el = document.getElementById("filters"); 
+      el.innerText = JSON.stringify(filters, undefined, 4);
+   </script>
   </html>
   `);
 }

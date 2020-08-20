@@ -12,34 +12,34 @@ window.addEventListener("message", e => {
     port.start();
 
     const onPortMessage = e => {
-        console.log('received message on port', e);
-        console.log(`referenceId = ${referenceId}`);
-    
-        
         if (e.data.method) {
-            console.log(`received rpc event message ${e.data.method}`);
+            console.log(`received rpc event message with referenceId = ${referenceId} and method ${e.data.method}`);
             switch(e.data.method) {
                 case '/v1/onDrill':
                     const filters = e.data.params['filters'];
-                    console.log(`filters = `, filters);
+                    console.log(`filters = ` + JSON.stringify(filters));
                     const iframe = document.querySelector(`#iframe${referenceId}`);
-                    iframe.src = `/embed/page?column=${filters[0].column}&operand=${filters[0].operand}&values=${filters[0].values.join()}`;
+                    if (window.ENV.REPLACE_IFRAME) {
+                        iframe.src = `/embed/page?filters=${JSON.stringify(filters)}`
+                    }
                     break;
                 case '/v1/onFrameSizeChange':
                     console.log(`width = ${e.data.params['width']}`);
                     console.log(`height = ${e.data.params['height']}`);
                     break;
+                default:
+                    console.log('params = ' + JSON.stringify(e.data.params));
             }
         }
     
         if (e.data.hasOwnProperty('result')) {
-            console.log('received rpc response message');
+            console.log(`received rpc response message with referenceId = ${referenceId}`);
             const result = e.data.result;
             console.log(`result = ${result}`);
         }
     
         if (e.data.error) {
-            console.log('received rpc error message');
+            console.log(`received rpc error message with referenceId = ${referenceId}`);
             console.log('error = ', e.data.error);
         }
     };

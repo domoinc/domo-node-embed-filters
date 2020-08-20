@@ -8,12 +8,23 @@ const path = require('path');
 const fs = require('fs');
 const embed = require('./embed.js');
 const app = express();
-const port = 3001;
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({
   extended: false
 }))
 const users = require('./users.js');
+const yargs = require('yargs');
+
+const argv = yargs
+    .option('port', {
+        alias: 'p',
+        description: 'Specify which port to listen on',
+        default: 3001,
+        type: 'number',
+    })
+    .help()
+    .alias('help', 'h')
+    .argv;
 
 function findUser (username, callback) {
   user = users.find(user => {
@@ -74,7 +85,7 @@ app.get('/embed/items/:itemId', passport.authenticationMiddleware(), (req, res, 
   if (config.embedId) {
     embed.handleRequest(req, res, next, req.user.config['visualization'+req.params.itemId]);
   } else {
-    next(Error(`The EMBED_ID${req.params.itemId} environment variable in your .env file was not set. Please check the your .env.`));
+    next(`The EMBED_ID${req.params.itemId} environment variable in your .env file is not set. Please set this in order to view content here.`);
   }
 });
 
@@ -95,6 +106,7 @@ app.post('/login', passport.authenticate('local', {
 app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
   fs.readFile(path.join(__dirname, process.env.USE_XHR ? 'sample_xhr.html' : 'sample.html'), 'utf8', function(err, contents) {
     let newContents = contents.replace('USER', `${req.user.username}`);
+    newContents = newContents.replace('REPLACE_IFRAME_FROM_ENV', process.env.REPLACE_IFRAME);
     res.send(newContents);
   });
 });
@@ -106,4 +118,4 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(argv.port, () => console.log(`Example app listening on port ${argv.port}!`))
