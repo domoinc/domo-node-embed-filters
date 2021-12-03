@@ -1,4 +1,4 @@
-const request = require('request');
+const axios = require('axios');
 const jws = require('jws');
 const {ACCESS_TOKEN_URL, EMBED_TOKEN_URL, EMBED_URL} = require('./constants.js');
 
@@ -11,39 +11,32 @@ function getEmbedToken(req, res, next, config) {
       console.log('embed token is expired');
       getAccessToken(req, res, next, config).then(() => {
         console.log('creating new embed token');
-        request.post(EMBED_TOKEN_URL,
+        axios.post(EMBED_TOKEN_URL,
           { 
-            json: {
-              "sessionLength": 1440, 
-              "authorizations": [
-                {
-                  "token": config.embedId, 
-                  "permissions": ["READ", "FILTER", "EXPORT"], 
-                  "filters": config.filters,
-                  "policies": config.policies,
-                }
-              ]
-            },
+            "sessionLength": 1440, 
+            "authorizations": [
+              {
+                "token": config.embedId, 
+                "permissions": ["READ", "FILTER", "EXPORT"], 
+                "filters": config.filters,
+                "policies": config.policies,
+              }
+            ]
+          },
+          {
             headers: {
               'Authorization': 'Bearer ' + config.accessToken,
               'content-type': 'application/json; chartset=utf-8',
               'accept': '*/*'
-            } 
-          },
-          function (err, response, body) {
-            if (err) {
-              next(err);
             }
-            else if (body.error) {
-              console.log('body', body);
-              next(Error(body.error));
-            }
-            else if (response.statusCode >= 400) {
-              console.log('body', body);
-              next(Error(body.statusReason));
+          })
+          .then(function (response) {
+            if (response.data.error) {
+              console.log(response.data);
+              next(Error(response.data.error));
             }
             else {
-              config.embedToken = body.authentication;
+              config.embedToken = response.data.authentication;
               const decodedToken = jws.decode(config.embedToken);
               if (decodedToken.payload.emb.length === 0) {
                 next(Error('The emb field in the embed token is empty. This usually means the user associated with the clientid/clientsecret does not have access to this card.'));
@@ -55,7 +48,11 @@ function getEmbedToken(req, res, next, config) {
               }
             }
           }
-        );
+        )
+        .catch(function (error) {
+          console.log('error', error);
+          next(Error(error));
+        })
       });
     }
   });
@@ -70,37 +67,31 @@ function getAccessToken(req, res, next, config) {
     } else {
       console.log('access token is expired');
       console.log('creating new access token');
-      request.get(ACCESS_TOKEN_URL,
+      axios.get(ACCESS_TOKEN_URL,
       {
         headers: {
           "Authorization": "Basic " + Buffer.from(config.clientId + ":" + config.clientSecret).toString("base64")
         }
-      },
-      function(err, response, body) {
-        if (err) {
-          console.log('error creating access token');
-          next(err);
+      })
+      .then(function(response) {
+        try {
+          // console.log('response for access token is = ', response.data);
+          const data = response.data;
+          config.userId = data.userId;
+          config.accessToken = data.access_token;
+          // We'll say it's expired 60 seconds before it actually does to make sure we aren't using an invalid access token.
+          config.accessTokenExpiration = Math.floor(Date.now() / 1000) + (data.expires_in - 60);
+          console.log('access token created: valid until ' + config.accessTokenExpiration);
+          resolve();
+        } catch (e) {
+          console.log('Exception trying to parse access token response: response = ', response.data, e);
+          next('Exception trying to parse access token response: response = ', response.data, e);
         }
-        else if (response.statusCode >= 400) {
-          console.log('body', body);
-          next(Error(body.statusReason));
-        }
-        else {
-          try {
-            //console.log(body);
-            const json = JSON.parse(body);
-            config.userId = json.userId;
-            config.accessToken = json.access_token;
-            // We'll say it's expired 60 seconds before it actually does to make sure we aren't using an invalid access token.
-            config.accessTokenExpiration = Math.floor(Date.now() / 1000) + (json.expires_in - 60);
-            console.log('access token created: valid until ' + config.accessTokenExpiration);
-            resolve();
-          } catch (e) {
-            console.log('Exception trying to parse access token response: response = ', body, e);
-            next('Exception trying to parse access token response: response = ', body, e);
-          }
-        }
-      });
+      })
+      .catch(function (error) {
+        console.log('error', error);
+        next(Error(error));
+      })
     }
   });
 }

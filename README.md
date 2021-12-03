@@ -24,9 +24,9 @@
    # yarn
    ```
 
-5. Create a file in the base folder of the project named .env
+5. Modify the existing file in the base folder of the project named .env
 
-6. Inside of this file add the following configuration settings but using your own values:
+6. Inside of this file change the following configuration settings but using your own values:
    ```
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET

@@ -104,7 +104,7 @@ app.post('/login', passport.authenticate('local', {
 
 
 app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
-  fs.readFile(path.join(__dirname, process.env.USE_XHR ? 'sample_xhr.html' : 'sample.html'), 'utf8', function(err, contents) {
+  fs.readFile(path.join(__dirname, process.env.USE_XHR === 'true' ? 'sample_xhr.html' : 'sample.html'), 'utf8', function(err, contents) {
     let newContents = contents.replace('USER', `${req.user.username}`);
     newContents = newContents.replace('REPLACE_IFRAME_FROM_ENV', process.env.REPLACE_IFRAME);
     res.send(newContents);
