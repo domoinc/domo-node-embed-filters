@@ -5,6 +5,11 @@
 # NodeJS - Private Embed with Programmatic Filtering Example Code
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
 
+
+### Support
+
+* Please report any bugs, questions, or issues you have with these code samples to Domo Support.
+
 ### About
 
 * Example express server demonstrating private embed with programmatic filtering
