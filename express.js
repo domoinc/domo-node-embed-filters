@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express')
 const passport = require('passport')
@@ -25,6 +24,12 @@ const argv = yargs
     .help()
     .alias('help', 'h')
     .argv;
+
+
+// Add in the variables for routing to the identity broker
+const jwt = require('jsonwebtoken');
+const uuid = require('uuid');
+
 
 function findUser (username, callback) {
   user = users.find(user => {
@@ -102,13 +107,32 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: '/'
 }))
 
+// This section will draw the differnet content based on the user that logs in. It is currently hardcoded embed the platform when samantha logs in, but embed individual cards when anyone else logs in
 
 app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
-  fs.readFile(path.join(__dirname, process.env.USE_XHR === 'true' ? 'sample_xhr.html' : 'sample.html'), 'utf8', function(err, contents) {
-    let newContents = contents.replace('USER', `${req.user.username}`);
-    newContents = newContents.replace('REPLACE_IFRAME_FROM_ENV', process.env.REPLACE_IFRAME);
-    res.send(newContents);
-  });
+  	fs.readFile(path.join(__dirname, process.env.USE_XHR === 'true' ? 'sample_xhr.html' : 'sample.html'), 'utf8', function(err, contents) {
+    		let newContents = contents.replace('USER', `${req.user.username}`);
+    		if (user.username==="samantha"){
+			// Here we generate the URL using the info passed
+	 		const jwtBody = {
+                		sub: 1,
+                		name: user.username,
+                		email: user.username.concat("@domo.com") ,
+                		jti: uuid.v4()
+        		};
+
+        		jwtBody[process.env.KEY_ATTRIBUTE] = process.env.MAPPING_VALUE;
+
+        		const token = jwt.sign(jwtBody, process.env.JWT_SECRET, { expiresIn: "5m" });
+        		url = process.env.IDP_URL + '/jwt?token=' + token;
+
+        		newContents = newContents.replace('/embed/items/1',url); 
+			res.send(newContents);
+    		} else {
+       			newContents = newContents.replace('REPLACE_IFRAME_FROM_ENV', process.env.REPLACE_IFRAME);
+			res.send(newContents);
+    		}
+  	});
 });
 
 app.use(express.static('public'))
