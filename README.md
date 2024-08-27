@@ -91,11 +91,15 @@
     ```
 
 1. Open App & Verify Embed
-    - In your browser go to the url localhost:3001 and verify that you are able to see you the card or dashboard appearing there after you login.
-    - The available usernames to login with are listed in the express.js file and they are as follows: mike, susan, tom, rachael, and samantha.
-    - The password is not verified and so any will work.
-    - Logging in as mike, susan, tom, or rachel will show the embedded card or dashboard as defined in the .env file.
-    - Logging in as **samantha** will display a **full** embedded Domo **instance**, as defined in the .env file.
+    1. **Open App**
+        - In your browser go to the url localhost:3001 and verify that you are able to see you the card or dashboard appearing there after you login.
+    1. **Login**
+        - The available usernames to login with are listed in the express.js file and they are as follows: mike, susan, tom, rachael, and samantha.
+        - The password is not verified and so any will work.
+        - Logging in as mike, susan, tom, or rachel will show the embedded card or dashboard as defined in the .env file.
+        - Logging in as **samantha** will display a **full** embedded Domo **instance**, as defined in the .env file.
+    1. **Verify**
+        -  Once logged in, your card/dashboard should appear embedded on the page.
 
 
 1. Once you have verified your card or dashboard is showing up in the example site, open up the file users.js in a text editor and modify the filter settings for each user to customize the filtering that each user will have applied to them. Currently each user has an empty filter being applied to them "[]". There are some example filters in the file that are commented out that you can use that give you an idea of the format expected for the filters. Once you make filter changes to the users.js file, you will need to save the file, restart the express server, refresh the page, and then log back in to see your filter changes. The complete list of available operators for use in filters are as follows: "IN", "NOT_IN", "EQUALS", "NOT_EQUALS", "GREATER_THAN", "GREAT_THAN_EQUALS_TO", "LESS_THAN", "LESS_THAN_EQUALS_TO". Alternatively, modify the MAPPING_VALUE that is defined to route samantha to a different Organization when that user logs in. 
