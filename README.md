@@ -91,7 +91,7 @@
 
 10. Open App & Verify Embed
     1. **Open App**
-        - In your browser go to the url localhost:3001 and verify that you are able to see you the card or dashboard appearing there after you login.
+        - In your browser go to the url `localhost:3001` and verify that you are able to see you the card or dashboard appearing there after you login.
     1. **Login**
         - The available usernames to login with are listed in the express.js file and they are as follows: mike, susan, tom, rachael, and samantha.
         - The password is not verified and so any will work.
