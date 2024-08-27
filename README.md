@@ -80,13 +80,13 @@
   ```
 9. Start the express server like this in the base folder of the project
    ```
-   # yarn start
+   yarn start
    ```
 
     - An alternate port can be specified to start the program on by adding -p number to the end of the yarn start command like this:
       
     ```
-    # yarn start -p 3002
+    yarn start -p 3002
     ```
 
 10. Open App & Verify Embed
