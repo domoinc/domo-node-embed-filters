@@ -78,6 +78,7 @@
   # The MAPPING_VALUE is the value used to route the authenticated user to the correct Domo isntance. It needs to match the defined value for your target instance as shown in Admin -> Domo Everywhere -> Embed -> Mapping next to the Organization domain you wish to route to, listed in the "Attribute Value" column. 
   #MAPPING_VALUE = XXXXXXXXXXXXXX
   ```
+
 9. Start the express server like this in the base folder of the project
    ```
    yarn start
@@ -118,7 +119,7 @@
             - "LESS_THAN_EQUALS_TO"
     - You can also modify the `MAPPING_VALUE` that is defined to route samantha to a different Organization when that user logs in. 
 
-13. Learn More
+12. Learn More
     - For information on how the JavaScript API works to both send and receive messages from Domo embedded iframes,  see the `public/jsapi.js` file.
     - To test out the API, you can apply a filter to all of the cards by using the forms at the top of the app page.
     - You can also click on the charts and see how the code in the `jsapi.js` file uses procedure calls sent from the iframe to route the iframe to a different url including the filters as part of the new url. 
