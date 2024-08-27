@@ -16,22 +16,24 @@
 
 ### Setup
 
-1. Install nodejs https://nodejs.org/en/download/
+1. Install Node (https://nodejs.org/en/download/)
 
-2. Install yarn - https://yarnpkg.com/en/docs/install
+2. Install yarn (https://yarnpkg.com/en/docs/install)
 
 2. Locate or create the dashboard or card that you would like to embed in Domo.
 
 3. Embed the card or dashboard using the 'Private' Embed option.
 
-4. In the base folder of the repository run yarn to install the necessary dependencies.
+4. Clone or download this repository.
+
+5. In the base folder of the repository run yarn to install the necessary dependencies.
    ```
-   # yarn
+   yarn
    ```
 
-5. Modify the existing file in the base folder of the project named .env
+6. Modify the existing file in the base folder of the project named .env
 
-6. Inside of this file change the following configuration settings but using your own values:
+7. Inside of this file change the following configuration settings but using your own values:
    ```
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
@@ -69,12 +71,12 @@
   The MAPPING_VALUE is the value used to route the authenticated user to the correct Domo isntance. It needs to match the defined value for your target instance as shown in Admin -> Domo Everywhere -> Embed -> Mapping next to the Organization domain you wish to route to, listed in the "Attribute Value" column. 
 
 
-7. Start the express server like this in the base folder of the project
+8. Start the express server like this in the base folder of the project
    ```
    # yarn start
    ```
 
-8. An alternate port can be specified to start the program on by adding -p number to the end of the yarn start command like this:
+9. An alternate port can be specified to start the program on by adding -p number to the end of the yarn start command like this:
 ```
 # yarn start -p 3002
 ```
