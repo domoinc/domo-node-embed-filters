@@ -34,6 +34,13 @@
 1. Modify the existing file in the base folder of the project named `.env`
 
 1. Inside of this file change the following configuration settings but using your own values:
+ > [!IMPORTANT]  
+ > For this specific app, when setting up your client id and secret, be sure to give your app at least the following **scopes**:
+ >   - audit
+ >   - data
+ >   - dashboard
+ >   - user
+ 
    ```properties
    # The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
    # For more information about creating the CLIENT_ID and CLIENT_SECRET see https://developer.domo.com/docs/authentication/overview-4.  
