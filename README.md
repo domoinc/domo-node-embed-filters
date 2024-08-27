@@ -116,6 +116,9 @@
             - "GREAT_THAN_EQUALS_TO"
             - "LESS_THAN"
             - "LESS_THAN_EQUALS_TO"
-    - Alternatively, modify the `MAPPING_VALUE` that is defined to route samantha to a different Organization when that user logs in. 
+    - You can also modify the `MAPPING_VALUE` that is defined to route samantha to a different Organization when that user logs in. 
 
-13. For information on how the javascript api works to both send and receive messages from Domo embedded iframes see the jsapi.js file. To test out the api you can apply a filter to all of the cards by using the forms at the top of the page. You can also click on the charts and see how the code in the jsapi.js file uses procedure calls sent from the iframe to route the iframe to a different url including the filters as part of the new url. 
+13. Learn More
+    - For information on how the JavaScript API works to both send and receive messages from Domo embedded iframes,  see the `public/jsapi.js` file.
+    - To test out the API, you can apply a filter to all of the cards by using the forms at the top of the app page.
+    - You can also click on the charts and see how the code in the `jsapi.js` file uses procedure calls sent from the iframe to route the iframe to a different url including the filters as part of the new url. 
