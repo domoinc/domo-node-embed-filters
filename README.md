@@ -31,9 +31,9 @@
    yarn
    ```
 
-7. Modify the existing file in the base folder of the project named `.env`
+7. Rename the `.env.template` file to `.env`
 
-8. Inside of this file change the following configuration settings but using your own values:
+8. Inside of this file, change the following configuration settings but using your own values:
   > [!IMPORTANT]  
   > For this specific app, when setting up your client id and secret, be sure to give your app at least the following **scopes**:
   >   - audit
