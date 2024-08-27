@@ -95,8 +95,9 @@
     1. **Login**
         - The available usernames to login with are listed in the express.js file and they are as follows: mike, susan, tom, rachael, and samantha.
         - The password is not verified and so any will work.
-        - Logging in as mike, susan, tom, or rachel will show the embedded card or dashboard as defined in the .env file.
-        - Logging in as **samantha** will display a **full** embedded Domo **instance**, as defined in the .env file.
+        - Logging in as mike, susan, tom, or rachel will show the embedded card or dashboard as defined in the `.env` file.
+        - Logging in as **samantha** will display a **full** embedded Domo **instance**, as defined in the `.env` file.
+            - :exclamation: For full instance embed to work, you need to have provided, `JWT_SECRET`,`KEY_ATTRIBUTE`, and `MAPPING_VALUE` in your `.env` file.
     1. **Verify**
         -  Once logged in, your card/dashboard should appear embedded on the page.
 
