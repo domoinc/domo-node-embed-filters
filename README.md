@@ -35,39 +35,42 @@
 
 7. Inside of this file change the following configuration settings but using your own values:
    ```properties
+   # The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
+   # For more information about creating the CLIENT_ID and CLIENT_SECRET see https://developer.domo.com/docs/authentication/overview-4.  
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
+
+   # The EMBED_ID references the card or the dashboard you are embedding.  
    EMBED_ID=YOUR_EMBED_ID
+
+   # The EMBED_TYPE must be either the word 'dashboard' or 'card' (without quotes).  
    EMBED_TYPE=dashboard
 
-   # Optional settings
+   # Optional Settings
+   # -----------------
+   # Include the USE_XHR setting only if cookie based authentication won't work for the endpoint you create on your server.
    USE_XHR=true
+
+   # If REPLACE_IFRAME is set to true, when a part of a card chart is clicked, it will cause the iframe to be replaced with a message showing the filter object the click generated otherwise the filters will just be reported via browser console messages.
    REPLACE_IFRAME=true
+
+   # You can include multiple embedded cards or dashboards on the sample dashboard as well by configuring more than one EMBEDID in your .env file (e.g. EMBED_ID2, EMBED_ID3). If you add these, you will need to uncomment their corresponding html in the sample.html file however for this to work and you may want to adjust the specified widths and heights of the embedded content again by modifying the sample.html file.
    EMBED_ID{X}=YOUR_EMBED_ID
 
    # Optional settings for testing the Domo Everywhere edit experience; routing users to specific instances. For more information on the Edit experience, see here: https://domo-support.domo.com/s/article/6523741250455?language=en_US
    # ---
-   # The Embed URL for Identity Broker is the URL that receives authentication, verifies the user, and routes to the correct place. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing 
+   # The IDP_URL is the Embed URL for Identity Broker, which is the URL that receives authentication, verifies the user, and routes to the correct place. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing
    IDP_URL=HTTPS://YOUR_IDP_URL.domo.com
+   
+   # The JWT_SECRET is the authentication method for authenticating to the IDP. This value should be kept safe. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing -> Change Authentication Method to JWT Secret, then click "Generate Secret"
    JWT_SECRET = YOUR_JWT_SECRET
-   # The KEY_ATTRIBUTE variable name is defined in Domo under Admin -> Deomo Everywhere -> Embed -> Mapping
+   
+   # The KEY_ATTRIBUTE is the variable name that you pass to denote which user gets routed to which instance. The name is customizable, so this variable name must match the value that is defined in Domo. Verify by looking in Admin -> Domo Everywhre -> Embed -> Mapping and seeing the value in the "Key Attribute" section. The defined value in this variable must match what is listed in Domo.
    KEY_ATTRIBUTE = keyAttributeName
-   # The MAPPING_VALUE is defined for each instance. Verify the value in the MAPPING_VALUE variable below matches the associated name in the "Attribute Value" column for the target organization at Admin -> Domo Everywhere -> Embed -> Mapping 
+
+   # The MAPPING_VALUE is the value used to route the authenticated user to the correct Domo isntance. It needs to match the defined value for your target instance as shown in Admin -> Domo Everywhere -> Embed -> Mapping next to the Organization domain you wish to route to, listed in the "Attribute Value" column. 
    MAPPING_VALUE = XXXXXXXXXXXXXX
    ```
- 
-   - The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
-   - For more information about creating the CLIENT_ID and CLIENT_SECRET see https://developer.domo.com/docs/authentication/overview-4.  
-   - The EMBED_ID references the card or the dashboard you are embedding.  
-   - The EMBED_TYPE must be either the word 'dashboard' or 'card' (without the quotes).  
-   - Include the USE_XHR setting only if cookie based authentication won't work for the endpoint you create on your server.
-   - If REPLACE_IFRAME is set to true, when a part of a card chart is clicked, it will cause the iframe to be replaced with a message showing the filter object the click generated otherwise the filters will just be reported via browser console messages.
-   - You can include multiple embedded cards or dashboards on the sample dashboard as well by configuring more than one EMBEDID in your .env file (e.g. EMBED_ID2, EMBED_ID3). If you add these, you will need to uncomment their corresponding html in the sample.html file however for this to work and you may want to adjust the specified widths and heights of the embedded content again by modifying the sample.html file.
-   - The IDP_URL is the Embed URL for Identity Broker is the URL that receives authentication, verifies the user, and routes to the correct place. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing
-   - The JWT_SECRET is the authentication method for authenticating to the IDP. This value should be kept safe. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing -> Change Authentication Method to JWT Secret, then click "Generate Secret"
-   - The KEY_ATTRIBUTE is the variable name that you pass to denote which user gets routed to which instance. The name is customizable, so this variable name must match the value that is defined in Domo. Very by looking in Admin -> Domo Everywhre -> Embed -> Mapping and seeing the value in the "Key Attribute" section. The defined value in this variable must match what is listed in Domo.
-   - The MAPPING_VALUE is the value used to route the authenticated user to the correct Domo isntance. It needs to match the defined value for your target instance as shown in Admin -> Domo Everywhere -> Embed -> Mapping next to the Organization domain you wish to route to, listed in the "Attribute Value" column. 
-
 
 8. Start the express server like this in the base folder of the project
    ```
