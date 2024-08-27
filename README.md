@@ -40,7 +40,7 @@
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
 
-   # The EMBED_ID references the card or the dashboard you are embedding.  
+   # The EMBED_ID references the card or the dashboard you are embedding; it will be some alphanumeric identifier like `K2Okl`. Get it from the embedding dialog box.
    EMBED_ID=YOUR_EMBED_ID
 
    # The EMBED_TYPE must be either the word 'dashboard' or 'card' (without quotes).  
