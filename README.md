@@ -31,7 +31,7 @@
    yarn
    ```
 
-6. Modify the existing file in the base folder of the project named .env
+6. Modify the existing file in the base folder of the project named `.env`
 
 7. Inside of this file change the following configuration settings but using your own values:
    ```
@@ -40,22 +40,20 @@
    EMBED_ID=YOUR_EMBED_ID
    EMBED_TYPE=dashboard
 
-   # optional settings
+   # Optional settings
    USE_XHR=true
    REPLACE_IFRAME=true
    EMBED_ID{X}=YOUR_EMBED_ID
 
-   # optional settings for testing the Domo Everywhere edit experience; routing users to specific instances. For more information on the Edit experience, see here: https://domo-support.domo.com/s/article/6523741250455?language=en_US
+   # Optional settings for testing the Domo Everywhere edit experience; routing users to specific instances. For more information on the Edit experience, see here: https://domo-support.domo.com/s/article/6523741250455?language=en_US
+   # ---
    # The Embed URL for Identity Broker is the URL that receives authentication, verifies the user, and routes to the correct place. It is found in your primary Domo instance under Admin -> Domo Everywhere -> Embed -> Routing 
-   # The KEY_ATTRIBUTE variable name is defined in Domo under Admin -> Deomo Everywhere -> Embed -> Mapping
-   # The MAPPING_VALUE is defined for each instance. Verify the value in the MAPPING_VALUE variable below matches the associated name in the "Attibute Value" colummn for the target organization at Admin -> Domo Everywhere -> Embed -> Mapping 
    IDP_URL=HTTPS://YOUR_IDP_URL.domo.com
    JWT_SECRET = YOUR_JWT_SECRET
+   # The KEY_ATTRIBUTE variable name is defined in Domo under Admin -> Deomo Everywhere -> Embed -> Mapping
    KEY_ATTRIBUTE = keyAttributeName
+   # The MAPPING_VALUE is defined for each instance. Verify the value in the MAPPING_VALUE variable below matches the associated name in the "Attibute Value" colummn for the target organization at Admin -> Domo Everywhere -> Embed -> Mapping 
    MAPPING_VALUE = XXXXXXXXXXXXXX
- 
-   
-
    ```
  
    The CLIENT_ID and CLIENT_SECRET is used to create the access token which will be used to then create an embed token for use with the private embed.
