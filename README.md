@@ -34,7 +34,7 @@
 6. Modify the existing file in the base folder of the project named `.env`
 
 7. Inside of this file change the following configuration settings but using your own values:
-   ```
+   ```properties
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
    EMBED_ID=YOUR_EMBED_ID
@@ -52,7 +52,7 @@
    JWT_SECRET = YOUR_JWT_SECRET
    # The KEY_ATTRIBUTE variable name is defined in Domo under Admin -> Deomo Everywhere -> Embed -> Mapping
    KEY_ATTRIBUTE = keyAttributeName
-   # The MAPPING_VALUE is defined for each instance. Verify the value in the MAPPING_VALUE variable below matches the associated name in the "Attibute Value" colummn for the target organization at Admin -> Domo Everywhere -> Embed -> Mapping 
+   # The MAPPING_VALUE is defined for each instance. Verify the value in the MAPPING_VALUE variable below matches the associated name in the "Attribute Value" column for the target organization at Admin -> Domo Everywhere -> Embed -> Mapping 
    MAPPING_VALUE = XXXXXXXXXXXXXX
    ```
  
