@@ -20,6 +20,8 @@ function getEmbedToken(req, res, next, config) {
                 "permissions": ["READ", "FILTER", "EXPORT"], 
                 "filters": config.filters,
                 "policies": config.policies,
+                "datasetRedirects": config.datasetRedirects,
+                "sqlFilters": config.sqlFilters,
               }
             ]
           },
