@@ -159,13 +159,6 @@ app.get('/api/embed-token/:embedId', (req, res, next) => {
 // Keep the original authenticated endpoint for backwards compatibility
 app.get(
   '/embed/items/:itemId',
-  (req, res, next) => {
-    console.log('Embed Debug: Request for item', req.params.itemId);
-    console.log('Embed Debug: Session ID:', req.sessionID);
-    console.log('Embed Debug: Is authenticated:', req.isAuthenticated());
-    console.log('Embed Debug: Cookies:', req.headers.cookie);
-    next();
-  },
   passport.authenticationMiddleware(),
   (req, res, next) => {
     const config = req.user.config['visualization' + req.params.itemId];
@@ -244,59 +237,13 @@ app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
   );
 });
 
-app.use(express.static('public'));
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
-
-// Explicit CORS for /auth route
-app.options(
-  '/auth',
-  cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-    credentials: true,
-  }),
-); // Handle pre-flight requests
-app.post(
-  '/auth',
-  cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-    credentials: true,
-  }),
-  (req, res) => {
-    console.log('CORS Debug: /auth route hit');
-    const { username } = req.body;
-
-    console.log('Auth Debug: Received username:', username);
-
-    // Simplified logic: Always authenticate the user
-    findUser(username, (err, user) => {
-      console.log('Auth Debug: User found:', user);
-      if (err || !user) {
-        console.log('Auth Debug: Invalid user');
-        return res.status(401).json({ message: 'Invalid user' });
-      }
-
-      // Log the user in by creating a session
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          console.log('Auth Debug: Login failed');
-          return res.status(500).json({ message: 'Login failed' });
-        }
-        console.log('Auth Debug: Authentication successful');
-        console.log('Auth Debug: Session ID:', req.sessionID);
-        console.log('Auth Debug: User authenticated:', req.isAuthenticated());
-        return res.json({
-          message: 'Authentication successful',
-          sessionId: req.sessionID,
-          redirect: '/',
-        });
-      });
-    });
-  },
-);
 
 app.listen(argv.port, () =>
   console.log(`Example app listening on port ${argv.port}!`),

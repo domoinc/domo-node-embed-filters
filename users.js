@@ -7,7 +7,11 @@ module.exports = [
         clientSecret: process.env.CLIENT_SECRET,
         embedId: process.env.EMBED_ID,
         filters: [
-          { column: 'ClientCompany', operator: 'IN', values: ['Nimbus Forge'] },
+          {
+            column: 'client_company',
+            operator: 'IN',
+            values: ['Nimbus Forge'],
+          },
         ],
         // filters: [],
       },
