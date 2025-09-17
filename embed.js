@@ -141,7 +141,7 @@ function secondsSinceEpoch() {
 }
 
 function returnEmbedInfo(req, res, config) {
-  if (process.env.USE_XHR) {
+  if (process.env.USE_XHR === 'true') {
     res.send(
       `{"embedToken": "${config.embedToken}", "embedUrl": "${EMBED_URL}${config.embedId}"}`,
     );
