@@ -60,7 +60,9 @@ function getEmbedToken(req, res, next, config) {
                 // We'll say it expires 60 seconds before it actually does so that we aren't using an invalid embed token
                 config.embedTokenExpiration = decodedToken.payload.exp - 60;
                 console.log(
-                  `embed token created: valid until ${config.embedTokenExpiration}`,
+                  `embed token created: valid until ${convertToLocalTimestamp(
+                    config.embedTokenExpiration,
+                  )}`,
                 );
                 resolve();
               }
@@ -112,7 +114,7 @@ function getAccessToken(req, res, next, config) {
               Math.floor(Date.now() / 1000) + (data.expires_in - 60);
             console.log(
               'access token created: valid until ' +
-                config.accessTokenExpiration,
+                convertToLocalTimestamp(config.accessTokenExpiration),
             );
             resolve();
           } catch (e) {
@@ -190,6 +192,15 @@ function showFilters(req, res) {
 function refreshEmbedToken(req, res, next, config) {
   return getEmbedToken(req, res, next, config);
 }
+
+function convertToLocalTimestamp(secondsSinceEpoch) {
+  const date = new Date(secondsSinceEpoch * 1000);
+  return date.toLocaleString();
+}
+
+// Example usage:
+// const localTimestamp = convertToLocalTimestamp(config.accessTokenExpiration);
+// console.log('Local timestamp:', localTimestamp);
 
 module.exports = {
   handleRequest,
