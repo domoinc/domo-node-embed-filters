@@ -111,15 +111,6 @@ To run and test the application, follow these steps:
 
 4. **Verify Embedding**: Ensure that the embedded dashboard or card is displayed correctly. If you encounter issues, check the `.env` configuration and server logs for errors.
 
-### Guidelines
-
-- Ensure your code follows the existing style and conventions.
-- Write clear commit messages and include comments where necessary.
-- Test your changes thoroughly before submitting.
-- Be respectful and collaborative in code reviews.
-
-Thank you for contributing!
-
 ## Documentation and Resources
 
 Here are some helpful links to get started and learn more:
