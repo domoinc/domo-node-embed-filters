@@ -51,7 +51,7 @@ const corsOptions = {
     if (origin.includes('localhost') || origin.endsWith('.domo.com')) {
       return callback(null, true);
     }
-    callback(new Error('Not allowed by CORS'));
+    callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
