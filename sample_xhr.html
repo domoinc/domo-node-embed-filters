@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sales Dashboard - XHR</title>
     <link rel="stylesheet" href="/styles.css" />
-    <script src="/clientScript.js"></script>
+    <script>
+      window.ENV = {
+        REPLACE_IFRAME: REPLACE_IFRAME_FROM_ENV,
+      };
+    </script>
+    <script src="/jsapi.js"></script>
+    <script src="/clientScript.js" defer></script>
   </head>
   <body>
     <header class="header">
@@ -45,7 +51,7 @@
           </h2>
           
           <div class="chart-container">
-            <iframe id="iframe" src=""></iframe>
+            <iframe id="iframe" name="domoEmbed" src=""></iframe>
           </div>
         </div>
       </div>
