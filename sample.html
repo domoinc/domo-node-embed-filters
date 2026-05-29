@@ -1,45 +1,77 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="/styles.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sales Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
     <script>
       window.ENV = {
-        REPLACE_IFRAME: REPLACE_IFRAME_FROM_ENV
-      }
+        REPLACE_IFRAME: REPLACE_IFRAME_FROM_ENV,
+      };
     </script>
     <script src="jsapi.js"></script>
   </head>
   <body>
-    <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; align-self: flex-start;">
-      <form id="filter_form" style="padding-top: 10px; color: black;" onsubmit="form_submit(event)">
-        <div>Input a column and value to filter by:</div>
-        <input id="column_input" type="text" id="fname" name="fname" placeholder="Column">
-        <input id="value_input" type="text" id="lname" name="lname" placeholder="Value">
-        <div>
-          <input type="submit" value="Submit">
-          <input type="button" value="Reset" onclick="reset_form()">
+    <header class="header">
+      <h1 class="header-title">Sales Dashboard</h1>
+      <a href="/logout" class="logout-button">Logout</a>
+    </header>
+
+    <div class="layout">
+      <div class="content">
+        <form id="filter_form" class="filter-form" onsubmit="form_submit(event)">
+          <div class="form-group">
+            <label for="column_input" class="filter-label">Column:</label>
+            <input
+              id="column_input"
+              type="text"
+              name="column"
+              class="filter-input"
+              placeholder="Enter column name"
+            />
+          </div>
+          <div class="form-group">
+            <label for="value_input" class="filter-label">Value:</label>
+            <input
+              id="value_input"
+              type="text"
+              name="value"
+              class="filter-input"
+              placeholder="Enter filter value"
+            />
+          </div>
+          <button type="submit" class="filter-button">Apply Filter</button>
+        </form>
+
+        <div class="charts-section">
+          <h2 class="charts-title">
+            Charts for <span class="charts-subtitle">USER</span>
+          </h2>
+          
+          <div class="chart-container">
+            <iframe id="iframe1" src="/embed/items/1"></iframe>
+          </div>
+          
+          <!-- Additional chart containers (commented out for now)
+          <div class="chart-container">
+            <iframe id="iframe2" src="/embed/items/2"></iframe>
+          </div>
+          <div class="chart-container">
+            <iframe id="iframe3" src="/embed/items/3"></iframe>
+          </div>
+          <div class="chart-container">
+            <iframe id="iframe4" src="/embed/items/4"></iframe>
+          </div>
+          <div class="chart-container">
+            <iframe id="iframe5" src="/embed/items/5"></iframe>
+          </div>
+          <div class="chart-container">
+            <iframe id="iframe6" src="/embed/items/6"></iframe>
+          </div>
+          -->
         </div>
-      </form>
-      <div style="color: black; text-align: center; font-size: 40px; font-weight: 700;"><span>Sales Charts for </span><span style="text-transform: capitalize">USER</span></div>
-      <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe1" src="/embed/items/1" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
       </div>
-      <!-- <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe2" src="/embed/items/2" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
-      </div>
-      <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe3" src="/embed/items/3" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
-      </div>
-      <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe4" src="/embed/items/4" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
-      </div>
-      <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe5" src="/embed/items/5" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
-      </div>
-      <div style="display: flex; justify-content: space-evenly; margin-top: 40px; width: 1200px; height: 600px; background-color: white; border-width: 2px; border-style: inset; color: black; font-size: 26px;">
-        <iframe id="iframe6" src="/embed/items/6" width="100%" height="100%" scrolling="no" style="border: none"></iframe>
-      </div> -->
-      <a href="/logout" style="text-align: center; display: block; color: white; margin-top: 30px; font-size: 20pt;" class="button">Logout</a>
     </div>
   </body>
 </html>
