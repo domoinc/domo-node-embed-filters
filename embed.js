@@ -128,10 +128,7 @@ function returnEmbedInfo(req, res, config) {
   // referenceId is an integer item index — coerce to avoid injection
   const referenceId = parseInt(req.params.itemId, 10) || '';
 
-  if (process.env.USE_XHR === 'true') {
-    res.json({ embedToken: config.embedToken, embedUrl: `${embedUrl}${config.embedId}?referenceId=${referenceId}` });
-  } else {
-    res.send(`
+  res.send(`
 <html>
   <body>
     <form id="form" action="${embedUrl}${config.embedId}?referenceId=${referenceId}" method="post">
@@ -140,7 +137,6 @@ function returnEmbedInfo(req, res, config) {
     <script>document.getElementById("form").submit();</script>
   </body>
 </html>`);
-  }
 }
 
 async function handleRequest(req, res, next, config) {
