@@ -34,10 +34,10 @@ window.addEventListener("message", e => {
                         retried[referenceId] = true;
                         const iframe = document.querySelector(`#iframe${referenceId}`);
                         if (iframe) {
-                            console.log(`embed ${referenceId} reported 0 width, reloading`);
-                            const src = iframe.src;
-                            iframe.src = '';
-                            iframe.src = src;
+                            console.log(`embed ${referenceId} reported 0 width, retrying in 2s`);
+                            setTimeout(() => {
+                                iframe.src = iframe.src;
+                            }, 2000);
                         }
                     }
                     break;
