@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const https = require('https');
 const passport = require('passport');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
@@ -250,20 +249,6 @@ app.get('/logout', function (req, res) {
   res.redirect('/');
 });
 
-const certPath = path.join(__dirname, 'certs');
-const keyFile = path.join(certPath, 'localhost-key.pem');
-const certFile = path.join(certPath, 'localhost.pem');
-
-if (fs.existsSync(keyFile) && fs.existsSync(certFile)) {
-  const httpsOptions = {
-    key: fs.readFileSync(keyFile),
-    cert: fs.readFileSync(certFile),
-  };
-  https.createServer(httpsOptions, app).listen(argv.port, () =>
-    console.log(`Example app listening on https://localhost:${argv.port}`),
-  );
-} else {
-  app.listen(argv.port, () =>
-    console.log(`Example app listening on http://localhost:${argv.port} (no certs found, PNA may block embeds)`),
-  );
-}
+app.listen(argv.port, () =>
+  console.log(`Example app listening on http://localhost:${argv.port}`),
+);
