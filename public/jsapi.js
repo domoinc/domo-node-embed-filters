@@ -1,4 +1,5 @@
 const ports = {};
+const retried = {};
 
 // https://www.jsonrpc.org/specification
 window.addEventListener("message", e => {
@@ -26,18 +27,31 @@ window.addEventListener("message", e => {
                 case '/v1/onFrameSizeChange':
                     console.log(`width = ${e.data.params['width']}`);
                     console.log(`height = ${e.data.params['height']}`);
+                    // Domo's session isn't ready on first load — the embed
+                    // reports 0×0 when its internal page fetch fails. Reload
+                    // the iframe once to use the now-established session.
+                    if (e.data.params['width'] === 0 && !retried[referenceId]) {
+                        retried[referenceId] = true;
+                        const iframe = document.querySelector(`#iframe${referenceId}`);
+                        if (iframe) {
+                            console.log(`embed ${referenceId} reported 0 width, reloading`);
+                            const src = iframe.src;
+                            iframe.src = '';
+                            iframe.src = src;
+                        }
+                    }
                     break;
                 default:
                     console.log('params = ' + JSON.stringify(e.data.params));
             }
         }
-    
+
         if (e.data.hasOwnProperty('result')) {
             console.log(`received rpc response message with referenceId = ${referenceId}`);
             const result = e.data.result;
             console.log(`result = ${result}`);
         }
-    
+
         if (e.data.error) {
             console.log(`received rpc error message with referenceId = ${referenceId}`);
             console.log('error = ', e.data.error);
