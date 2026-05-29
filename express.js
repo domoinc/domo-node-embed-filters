@@ -36,25 +36,30 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'], // Allow specific origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    credentials: true, // Enable credentials for cookie support
-  }),
-);
-
-// Handle pre-flight requests explicitly
-app.options('*', cors());
-
-// Allow static file requests explicitly
+// Chrome Private Network Access: Domo's iframe (public origin) needs to reach
+// localhost, which Chrome blocks unless we explicitly allow it in preflights.
 app.use((req, res, next) => {
-  if (!req.headers.origin && req.path.startsWith('/styles.css')) {
-    return next();
+  if (req.headers['access-control-request-private-network']) {
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
   }
   next();
 });
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (origin.includes('localhost') || origin.endsWith('.domo.com')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Add in the variables for routing to the identity broker
 const jwt = require('jsonwebtoken');
