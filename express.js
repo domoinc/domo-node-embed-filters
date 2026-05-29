@@ -144,13 +144,12 @@ app.get('/api/embed-token/:embedId', (req, res, next) => {
     return res.status(400).json({ error: 'Valid embed ID required' });
   }
 
-  // Create a simple config without user-specific data
+  // No filters applied — this endpoint demonstrates unauthenticated embedding.
+  // In production, always apply user-scoped filters to enforce row-level security.
   const config = {
     embedId: embedId,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    filters: [], // No filters for now
-    policies: [], // No policies for now
+    filters: [],
+    policies: [],
   };
 
   embed.handleRequest(req, res, next, config);
@@ -227,7 +226,7 @@ app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
         const token = jwt.sign(jwtBody, process.env.JWT_SECRET, {
           expiresIn: '5m',
         });
-        url = process.env.IDP_URL + '/jwt?token=' + token;
+        const url = process.env.IDP_URL + '/jwt?token=' + token;
 
         newContents = newContents.replace('/embed/items/1', url);
       }

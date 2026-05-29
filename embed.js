@@ -1,209 +1,185 @@
-const axios = require('axios');
 const jws = require('jws');
 const {
   ACCESS_TOKEN_URL,
-  EMBED_TOKEN_URL,
-  EMBED_URL,
+  EMBED_TOKEN_URL_DASHBOARD,
+  EMBED_TOKEN_URL_CARD,
+  EMBED_URL_DASHBOARD,
+  EMBED_URL_CARD,
 } = require('./constants.js');
-
-function getEmbedToken(req, res, next, config) {
-  return new Promise((resolve, reject) => {
-    console.log('getting embed token');
-    if (
-      config.embedToken &&
-      config.embedTokenExpiration &&
-      config.embedTokenExpiration > secondsSinceEpoch()
-    ) {
-      resolve();
-    } else {
-      console.log('embed token is expired');
-      getAccessToken(req, res, next, config).then(() => {
-        console.log('creating new embed token');
-        axios
-          .post(
-            EMBED_TOKEN_URL,
-            {
-              sessionLength: 1440,
-              authorizations: [
-                {
-                  token: config.embedId,
-                  permissions: ['READ', 'FILTER', 'EXPORT'],
-                  filters: config.filters,
-                  policies: config.policies,
-                  datasetRedirects: config.datasetRedirects,
-                  sqlFilters: config.sqlFilters,
-                },
-              ],
-            },
-            {
-              headers: {
-                Authorization: 'Bearer ' + config.accessToken,
-                'content-type': 'application/json; chartset=utf-8',
-                accept: '*/*',
-              },
-            },
-          )
-          .then(function (response) {
-            if (response.data.error) {
-              console.log(response.data);
-              next(Error(response.data.error));
-            } else {
-              config.embedToken = response.data.authentication;
-              const decodedToken = jws.decode(config.embedToken);
-              if (decodedToken.payload.emb.length === 0) {
-                next(
-                  Error(
-                    'The emb field in the embed token is empty. This usually means the user associated with the clientid/clientsecret does not have access to this card.',
-                  ),
-                );
-              } else {
-                // We'll say it expires 60 seconds before it actually does so that we aren't using an invalid embed token
-                config.embedTokenExpiration = decodedToken.payload.exp - 60;
-                console.log(
-                  `embed token created: valid until ${convertToLocalTimestamp(
-                    config.embedTokenExpiration,
-                  )}`,
-                );
-                resolve();
-              }
-            }
-          })
-          .catch(function (error) {
-            console.log('error', error);
-            next(Error(error));
-          });
-      });
-    }
-  });
-}
-
-function getAccessToken(req, res, next, config) {
-  return new Promise((resolve, reject) => {
-    console.log('getting access token');
-    if (
-      config.accessToken &&
-      config.accessTokenExpiration > secondsSinceEpoch()
-    ) {
-      console.log(
-        `access token is not expired: still valid for ${
-          config.accessTokenExpiration - secondsSinceEpoch()
-        } seconds`,
-      );
-      resolve();
-    } else {
-      console.log('access token is expired');
-      console.log('creating new access token');
-      axios
-        .get(ACCESS_TOKEN_URL, {
-          headers: {
-            Authorization:
-              'Basic ' +
-              Buffer.from(config.clientId + ':' + config.clientSecret).toString(
-                'base64',
-              ),
-          },
-        })
-        .then(function (response) {
-          try {
-            // console.log('response for access token is = ', response.data);
-            const data = response.data;
-            config.userId = data.userId;
-            config.accessToken = data.access_token;
-            // We'll say it's expired 60 seconds before it actually does to make sure we aren't using an invalid access token.
-            config.accessTokenExpiration =
-              Math.floor(Date.now() / 1000) + (data.expires_in - 60);
-            console.log(
-              'access token created: valid until ' +
-                convertToLocalTimestamp(config.accessTokenExpiration),
-            );
-            resolve();
-          } catch (e) {
-            console.log(
-              'Exception trying to parse access token response: response = ',
-              response.data,
-              e,
-            );
-            next(
-              'Exception trying to parse access token response: response = ',
-              response.data,
-              e,
-            );
-          }
-        })
-        .catch(function (error) {
-          console.log('error', error);
-          next(Error(error));
-        });
-    }
-  });
-}
 
 function secondsSinceEpoch() {
   return Math.floor(Date.now() / 1000);
 }
 
-function returnEmbedInfo(req, res, config) {
-  if (process.env.USE_XHR === 'true') {
-    res.send(
-      `{"embedToken": "${config.embedToken}", "embedUrl": "${EMBED_URL}${config.embedId}"}`,
+function convertToLocalTimestamp(seconds) {
+  return new Date(seconds * 1000).toLocaleString();
+}
+
+function getEmbedUrls() {
+  const isCard = process.env.EMBED_TYPE === 'card';
+  return {
+    embedTokenUrl: isCard ? EMBED_TOKEN_URL_CARD : EMBED_TOKEN_URL_DASHBOARD,
+    embedUrl: isCard ? EMBED_URL_CARD : EMBED_URL_DASHBOARD,
+  };
+}
+
+// Fetches and caches a Domo OAuth access token on the config object.
+// CLIENT_ID and CLIENT_SECRET are service-account credentials shared across
+// all users — they are not per-user and should never appear in user config.
+async function getAccessToken(config) {
+  if (config.accessToken && config.accessTokenExpiration > secondsSinceEpoch()) {
+    console.log(
+      `access token valid for ${config.accessTokenExpiration - secondsSinceEpoch()} more seconds`,
     );
+    return;
+  }
+
+  console.log('fetching new access token');
+  const response = await fetch(ACCESS_TOKEN_URL, {
+    headers: {
+      Authorization:
+        'Basic ' +
+        Buffer.from(
+          `${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`,
+        ).toString('base64'),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Access token request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+  config.accessToken = data.access_token;
+  config.userId = data.userId;
+  // Expire 60 seconds early to avoid using a token right as it expires
+  config.accessTokenExpiration = secondsSinceEpoch() + data.expires_in - 60;
+  console.log(`access token created: valid until ${convertToLocalTimestamp(config.accessTokenExpiration)}`);
+}
+
+// Fetches and caches a Domo embed token on the config object.
+// The filters array here is the row-level security boundary — it controls
+// what data the embedded user can see and cannot be overridden by the client.
+async function getEmbedToken(config) {
+  if (
+    config.embedToken &&
+    config.embedTokenExpiration &&
+    config.embedTokenExpiration > secondsSinceEpoch()
+  ) {
+    return;
+  }
+
+  console.log('embed token expired or missing, refreshing');
+  await getAccessToken(config);
+
+  const { embedTokenUrl } = getEmbedUrls();
+
+  const response = await fetch(embedTokenUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${config.accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sessionLength: 1440,
+      authorizations: [
+        {
+          token: config.embedId,
+          permissions: ['READ', 'FILTER', 'EXPORT'],
+          filters: config.filters,
+          policies: config.policies,
+          datasetRedirects: config.datasetRedirects,
+          sqlFilters: config.sqlFilters,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Embed token request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  config.embedToken = data.authentication;
+  const decoded = jws.decode(config.embedToken);
+  const payload = typeof decoded.payload === 'string'
+    ? JSON.parse(decoded.payload)
+    : decoded.payload;
+
+  if (!payload.emb || payload.emb.length === 0) {
+    throw new Error(
+      'The emb field in the embed token is empty. The service account may not have access to this content.',
+    );
+  }
+
+  // Expire 60 seconds early to avoid serving a token right as it expires
+  config.embedTokenExpiration = payload.exp - 60;
+  console.log(`embed token created: valid until ${convertToLocalTimestamp(config.embedTokenExpiration)}`);
+}
+
+function returnEmbedInfo(req, res, config) {
+  const { embedUrl } = getEmbedUrls();
+
+  if (process.env.USE_XHR === 'true') {
+    res.json({ embedToken: config.embedToken, embedUrl: `${embedUrl}${config.embedId}` });
   } else {
+    // referenceId is an integer item index — coerce to avoid injection
+    const referenceId = parseInt(req.params.itemId, 10) || '';
     res.send(`
-  <html>
-    <body>
-      <form id="form" action="${EMBED_URL}${config.embedId}?referenceId=${req.params.itemId}" method="post">
-        <input type="hidden" name="embedToken" value='${config.embedToken}'>
-      </form>
-      <script>
-        document.getElementById("form").submit();
-      </script>
-    </body>
-  </html>`);
+<html>
+  <body>
+    <form id="form" action="${embedUrl}${config.embedId}?referenceId=${referenceId}" method="post">
+      <input type="hidden" name="embedToken" value="${config.embedToken}">
+    </form>
+    <script>document.getElementById("form").submit();</script>
+  </body>
+</html>`);
   }
 }
 
-function handleRequest(req, res, next, config) {
-  getEmbedToken(req, res, next, config).then(() => {
+async function handleRequest(req, res, next, config) {
+  try {
+    await getEmbedToken(config);
     returnEmbedInfo(req, res, config);
-  });
+  } catch (err) {
+    next(err);
+  }
 }
 
 function showFilters(req, res) {
-  const query = req.query;
-  console.log(`query = `, query);
-  let message = `Transitioning content based on mouse click for the following filter:`;
+  // Parse server-side so untrusted input never lands raw in a script block
+  let filtersData;
+  try {
+    filtersData = JSON.parse(req.query.filters || '[]');
+  } catch (e) {
+    filtersData = [];
+  }
+
   res.send(`
-  <html>
-    <body>
-      <div style="margin: 20px; font-size: 24px; line-height: 30px;">
-        ${message}
-        <pre id="filters" style="line-height: 20px; font-size: 16px; color: lightslategrey; "></pre>
-      </div>
-    </body>
-    <script>
-      const filters = ${req.query.filters};
-      const el = document.getElementById("filters"); 
-      el.innerText = JSON.stringify(filters, undefined, 4);
-   </script>
-  </html>
-  `);
+<html>
+  <body>
+    <div style="margin: 20px; font-size: 24px; line-height: 30px;">
+      Transitioning content based on filter selection:
+      <pre id="filters" style="line-height: 20px; font-size: 16px; color: lightslategrey;"></pre>
+    </div>
+  </body>
+  <script>
+    const filters = ${JSON.stringify(filtersData)};
+    document.getElementById("filters").innerText = JSON.stringify(filters, undefined, 4);
+  </script>
+</html>`);
 }
-
-function refreshEmbedToken(req, res, next, config) {
-  return getEmbedToken(req, res, next, config);
-}
-
-function convertToLocalTimestamp(secondsSinceEpoch) {
-  const date = new Date(secondsSinceEpoch * 1000);
-  return date.toLocaleString();
-}
-
-// Example usage:
-// const localTimestamp = convertToLocalTimestamp(config.accessTokenExpiration);
-// console.log('Local timestamp:', localTimestamp);
 
 module.exports = {
   handleRequest,
-  refreshEmbedToken,
   showFilters,
+  // Exported for testing
+  getAccessToken,
+  getEmbedToken,
+  secondsSinceEpoch,
 };
