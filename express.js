@@ -105,13 +105,18 @@ passport.authenticationMiddleware = authenticationMiddleware;
 
 app.use(
   session({
+    // DEMO NOTE: In production, load this secret from an environment variable.
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true, // Create session even if not modified
     name: 'connect.sid', // Keep default Express session cookie name
     cookie: {
       secure: false, // Set to true if using HTTPS
-      httpOnly: false, // Allow client-side access for embedded cards
+      // httpOnly must be false so the jsapi.js PostMessage bridge can read the
+      // session cookie when communicating with the embedded Domo iframe.
+      // This is intentional for the demo embedding pattern; set to true in
+      // production if the PostMessage flow is handled server-side.
+      httpOnly: false,
       sameSite: 'lax', // Change from 'none' to 'lax' for localhost
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
@@ -132,6 +137,9 @@ if (
   );
   return;
 }
+
+// DEMO NOTE: No rate limiting is applied below. Add express-rate-limit before
+// deploying to a shared or production environment.
 
 // New simple token API - no authentication required, accepts embed_id directly
 app.get('/api/embed-token/:embedId', (req, res, next) => {
@@ -227,7 +235,7 @@ app.get('/dashboard', passport.authenticationMiddleware(), (req, res, next) => {
         const token = jwt.sign(jwtBody, process.env.JWT_SECRET, {
           expiresIn: '5m',
         });
-        url = process.env.IDP_URL + '/jwt?token=' + token;
+        const url = process.env.IDP_URL + '/jwt?token=' + token;
 
         newContents = newContents.replace('/embed/items/1', url);
       }
