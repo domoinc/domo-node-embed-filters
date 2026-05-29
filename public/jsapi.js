@@ -31,13 +31,13 @@ window.addEventListener("message", e => {
                     console.log('params = ' + JSON.stringify(e.data.params));
             }
         }
-
+    
         if (e.data.hasOwnProperty('result')) {
             console.log(`received rpc response message with referenceId = ${referenceId}`);
             const result = e.data.result;
             console.log(`result = ${result}`);
         }
-
+    
         if (e.data.error) {
             console.log(`received rpc error message with referenceId = ${referenceId}`);
             console.log('error = ', e.data.error);

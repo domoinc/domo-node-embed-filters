@@ -1,3 +1,14 @@
+function getGeneratedPageURL(embedToken, embedUrl) {
+  return `<html>
+  <body>
+    <form id="form" action="${embedUrl}" method="post">
+      <input type="hidden" name="embedToken" value="${embedToken}">
+    </form>
+    <script>document.getElementById("form").submit();</script>
+  </body>
+</html>`;
+}
+
 async function loadEmbed() {
   const response = await fetch('/embed/items/1');
   if (!response.ok) {
@@ -5,25 +16,7 @@ async function loadEmbed() {
     return;
   }
   const { embedToken, embedUrl } = await response.json();
-
-  // Submit the embed token form from the parent page, targeting the iframe by name.
-  // Using iframe.srcdoc would give the form a null origin, which Domo rejects on
-  // first load (no existing Domo session). Posting from the parent page sends
-  // Origin: http://localhost:3001, which Domo accepts.
-  const form = document.createElement('form');
-  form.method = 'post';
-  form.action = embedUrl;
-  form.target = 'domoEmbed';
-
-  const input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'embedToken';
-  input.value = embedToken;
-  form.appendChild(input);
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  document.getElementById('iframe').srcdoc = getGeneratedPageURL(embedToken, embedUrl);
 }
 
 loadEmbed();

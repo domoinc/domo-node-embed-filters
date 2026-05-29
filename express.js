@@ -30,36 +30,16 @@ const argv = yargs
   .help()
   .alias('help', 'h').argv;
 
-// Enable CORS with detailed logging
-app.use((req, res, next) => {
-  console.log(`CORS Debug: Origin - ${req.headers.origin}, Path - ${req.path}`);
-  next();
-});
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    credentials: true,
+  }),
+);
 
-// Chrome Private Network Access: Domo's iframe (public origin) needs to reach
-// localhost, which Chrome blocks unless we explicitly allow it in preflights.
-app.use((req, res, next) => {
-  if (req.headers['access-control-request-private-network']) {
-    res.setHeader('Access-Control-Allow-Private-Network', 'true');
-  }
-  next();
-});
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (origin.includes('localhost') || origin.endsWith('.domo.com')) {
-      return callback(null, true);
-    }
-    callback(null, false);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 
 // Add in the variables for routing to the identity broker
 const jwt = require('jsonwebtoken');
@@ -250,5 +230,5 @@ app.get('/logout', function (req, res) {
 });
 
 app.listen(argv.port, () =>
-  console.log(`Example app listening on http://localhost:${argv.port}`),
+  console.log(`Example app listening on port ${argv.port}!`),
 );
