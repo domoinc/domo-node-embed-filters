@@ -14,7 +14,7 @@
     "express": "^4.17.3",
     "express-session": "^1.17.2",
     "jsonwebtoken": "^9.0.2",
-    "jws": "^4.0.0",
+    "jws": "^4.0.1",
     "passport": "^0.5.0",
     "passport-local": "^1.0.0",
     "uuid": "^11.1.1",
