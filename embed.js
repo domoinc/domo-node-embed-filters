@@ -125,11 +125,12 @@ async function getEmbedToken(config) {
 function returnEmbedInfo(req, res, config) {
   const { embedUrl } = getEmbedUrls();
 
+  // referenceId is an integer item index — coerce to avoid injection
+  const referenceId = parseInt(req.params.itemId, 10) || '';
+
   if (process.env.USE_XHR === 'true') {
-    res.json({ embedToken: config.embedToken, embedUrl: `${embedUrl}${config.embedId}` });
+    res.json({ embedToken: config.embedToken, embedUrl: `${embedUrl}${config.embedId}?referenceId=${referenceId}` });
   } else {
-    // referenceId is an integer item index — coerce to avoid injection
-    const referenceId = parseInt(req.params.itemId, 10) || '';
     res.send(`
 <html>
   <body>
