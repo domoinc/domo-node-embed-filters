@@ -144,15 +144,15 @@ function secondsSinceEpoch() {
 
 function returnEmbedInfo(req, res, config) {
   if (process.env.USE_XHR === 'true') {
-    res.send(
-      `{"embedToken": "${config.embedToken}", "embedUrl": "${EMBED_URL}${config.embedId}"}`,
-    );
+    res.json({ embedToken: config.embedToken, embedUrl: `${EMBED_URL}${config.embedId}` });
   } else {
+    // referenceId is an integer item index from the route param — coerce to avoid injection
+    const referenceId = parseInt(req.params.itemId, 10) || '';
     res.send(`
   <html>
     <body>
-      <form id="form" action="${EMBED_URL}${config.embedId}?referenceId=${req.params.itemId}" method="post">
-        <input type="hidden" name="embedToken" value='${config.embedToken}'>
+      <form id="form" action="${EMBED_URL}${config.embedId}?referenceId=${referenceId}" method="post">
+        <input type="hidden" name="embedToken" value="${config.embedToken}">
       </form>
       <script>
         document.getElementById("form").submit();
@@ -171,6 +171,14 @@ function handleRequest(req, res, next, config) {
 function showFilters(req, res) {
   const query = req.query;
   console.log(`query = `, query);
+  // Parse on the server and re-serialize so untrusted input never lands raw in a script block
+  let filtersData;
+  try {
+    filtersData = JSON.parse(req.query.filters || '[]');
+  } catch (e) {
+    filtersData = [];
+  }
+  const filtersJson = JSON.stringify(filtersData);
   let message = `Transitioning content based on mouse click for the following filter:`;
   res.send(`
   <html>
@@ -181,8 +189,8 @@ function showFilters(req, res) {
       </div>
     </body>
     <script>
-      const filters = ${req.query.filters};
-      const el = document.getElementById("filters"); 
+      const filters = ${filtersJson};
+      const el = document.getElementById("filters");
       el.innerText = JSON.stringify(filters, undefined, 4);
    </script>
   </html>
