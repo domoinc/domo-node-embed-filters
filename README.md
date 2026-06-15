@@ -3,6 +3,7 @@
 </div>
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://www.opensource.org/licenses/MIT)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdomoinc%2Fdomo-node-embed-filters.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdomoinc%2Fdomo-node-embed-filters?ref=badge_shield)
 
 # NodeJS - Private Embed with Programmatic Filtering Example Code
 
@@ -124,3 +125,7 @@ Here are some helpful links to get started and learn more:
 ### Support
 
 - Please report any bugs, questions, or issues you have with these code samples to Domo Support.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdomoinc%2Fdomo-node-embed-filters.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdomoinc%2Fdomo-node-embed-filters?ref=badge_large)
