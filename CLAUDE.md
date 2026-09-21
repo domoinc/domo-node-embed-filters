@@ -29,7 +29,7 @@ npm start
 Required `.env` file (copy from `.env.example`):
 - `CLIENT_ID` / `CLIENT_SECRET`: Domo OAuth credentials from developer account
 - `EMBED_ID`: Dashboard/card/page ID to embed
-- `EMBED_TYPE`: One of `dashboard`, `page`, `card` (card embed **v2**), or `card-v1` (legacy card embed v1). Resolved in `constants.js`, which throws on an unrecognised value rather than falling back to a dashboard.
+- `EMBED_TYPE`: One of `dashboard`, `card` (card embed **v2**), `card-v1` (legacy card embed v1), or `app-studio`. Dashboard and page are the same surface, so there is only a `dashboard` type (`page` remains a deprecated alias); an App Studio app is a different surface and has its own type. Resolved in `constants.js`, which throws on an unrecognised value rather than falling back to a dashboard.
 
 Optional settings:
 - `USE_XHR=true`: Switches from standard iframe to XHR-based embedding (serves `sample_xhr.html` instead of `sample.html`)

@@ -71,7 +71,7 @@ To set up the application, you need to configure the following settings in a `.e
 - **CLIENT_ID**: The client ID generated in your Domo developer account. This is used to authenticate API requests and must be kept secure.
 - **CLIENT_SECRET**: The client secret associated with the `CLIENT_ID`. This acts as a password for API authentication. Never expose this value in client-side code or version control.
 - **EMBED_ID**: The unique identifier of the dashboard or card you want to embed. You can find this in the Domo platform when configuring your embed.
-- **EMBED_TYPE**: Specifies the type of embed. Valid values are `dashboard`, `page`, `card` and `card-v1`. Ensure this matches the type of content you are embedding — a mismatch is the usual cause of a 404 inside the iframe. `card` selects **card embed v2**; use `card-v1` only if you specifically need the legacy renderer. See [Card embed v1 vs v2](#card-embed-v1-vs-v2).
+- **EMBED_TYPE**: Which embed surface to use. Valid values are `dashboard`, `card`, `card-v1` and `app-studio`. Must match the kind of content `EMBED_ID` names — a mismatch is the usual cause of a 404 inside the iframe. `card` selects **card embed v2**; use `card-v1` only if you specifically need the legacy renderer. See [Embed surfaces and card v1 vs v2](#embed-surfaces-and-card-v1-vs-v2).
 
 #### Optional Settings
 
@@ -112,16 +112,24 @@ To run and test the application, follow these steps:
 
 4. **Verify Embedding**: Ensure that the embedded dashboard or card is displayed correctly. If you encounter issues, check the `.env` configuration and server logs for errors.
 
-## Card embed v1 vs v2
+## Embed surfaces and card v1 vs v2
 
-Dashboards have no v1/v2 split — `EMBED_TYPE=dashboard` (or `page`) is already served by the
-current-generation embed backend. Cards do, and this sample defaults to **v2**:
-
-| `EMBED_TYPE` | Render URL | Notes |
+| `EMBED_TYPE` | Render URL | Surface |
 |---|---|---|
-| `dashboard`, `page` | `https://public.domo.com/embed/pages/` | Default. No version split. |
-| `card`, `card-v2` | `https://public.domo.com/embed/cards/` | **Card embed v2** — recommended. |
-| `card-v1` | `https://public.domo.com/cards/` | Legacy card embed v1. |
+| `dashboard` | `https://public.domo.com/embed/pages/` | A dashboard. Default. No v1/v2 split. |
+| `card` | `https://public.domo.com/embed/cards/` | A single card, **v2** — recommended. |
+| `card-v1` | `https://public.domo.com/cards/` | A single card, legacy v1. |
+| `app-studio` | `https://public.domo.com/embed/app-studio/` | An App Studio app. |
+
+**"Dashboard" and "page" are the same surface**, so there is only one type for it —
+`dashboard`. The render URL says `pages` for historical reasons only. (`page` is still
+accepted as a deprecated alias, as is `card-v2` for `card`, but prefer the values above.)
+
+**An App Studio app is not a dashboard.** It is a distinct surface with its own app shell,
+its own page tabs, and its own backend controller, so it gets its own type and its own
+render URL.
+
+Only cards have a v1/v2 split, and this sample defaults to **v2**:
 
 v2 is served by the same backend as dashboard embed, which is why it supports more than v1:
 
@@ -138,14 +146,15 @@ works either way.
 
 ### Things that trip people up
 
-- **The embed-token endpoint does not select the version.** Domo resolves the content type
-  from the embed id itself, so `/v1/cards/embed/auth` is correct for v1 and v2 alike — only
-  the render URL differs. (`/v1/dashboards/embed/auth` is likewise an alias for
-  `/v1/stories/embed/auth`; "stories" is legacy terminology.)
+- **The embed-token endpoint does not select the surface or the version.** Domo resolves the
+  entity type from the embed id itself, so either token endpoint mints a working token for
+  dashboards, cards (v1 and v2) and App Studio apps alike — only the render URL differs.
+  (`/v1/dashboards/embed/auth` is an alias for `/v1/stories/embed/auth`; "stories" is legacy
+  terminology.)
 - **The JS API silently does nothing unless embed authorized domains are configured** for
   your instance. Add `?debug-js-api` to the embed URL to log why it did not initialise.
 - **An unrecognised `EMBED_TYPE` now throws at startup** instead of quietly falling back to
-  a dashboard.
+  a dashboard, which is what any unmatched value used to do.
 
 ## Documentation and Resources
 

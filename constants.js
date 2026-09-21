@@ -16,9 +16,15 @@ const EMBED_TOKEN_URL_CARD = `${API_HOST}/v1/cards/embed/auth`;
 
 // Render URLs -- the generated form POSTs the embed token to one of these.
 
-// Dashboard / page embed. There is no v1/v2 split for dashboards; this is
+// Dashboard embed. "Dashboard" and "page" are the same surface -- the URL says
+// `pages` for historical reasons only. There is no v1/v2 split here; this is
 // already served by the current-generation embed backend.
 const EMBED_URL_DASHBOARD = `${EMBED_HOST}/embed/pages/`;
+
+// App Studio app embed. A genuinely different surface from a dashboard: its own
+// app shell, its own page tabs, and its own backend controller. Not a dashboard
+// with extra chrome.
+const EMBED_URL_APP_STUDIO = `${EMBED_HOST}/embed/app-studio/`;
 
 // Card embed v2 -- the default for cards. Served by the same backend as
 // dashboard embed, so it supports more card types (Notebook/Text in addition to
@@ -48,7 +54,11 @@ switch (EMBED_TYPE) {
         EMBED_TOKEN_URL = EMBED_TOKEN_URL_CARD;
         EMBED_URL = EMBED_URL_CARD_V1;
         break;
-    // A dashboard and a page are the same thing here; both keep the defaults.
+    case 'app-studio':
+        EMBED_URL = EMBED_URL_APP_STUDIO;
+        break;
+    // 'page' is a deprecated alias -- a dashboard and a page are the same
+    // surface, so there is only one type for it. Prefer 'dashboard'.
     case 'dashboard':
     case 'page':
         break;
@@ -57,7 +67,7 @@ switch (EMBED_TYPE) {
         // an unrecognised value used to do.
         throw new Error(
             `Unrecognised EMBED_TYPE "${process.env.EMBED_TYPE}" in your .env file. ` +
-            `Valid values are: dashboard, page, card (v2), card-v2, card-v1.`,
+            `Valid values are: dashboard, card (v2), card-v1, app-studio.`,
         );
 }
 
