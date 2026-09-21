@@ -45,6 +45,7 @@ Follow these steps to set up the project:
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
    EMBED_ID=YOUR_EMBED_ID
+   # dashboard | page | card (card embed v2) | card-v1 (legacy)
    EMBED_TYPE=dashboard
 
    # Optional settings
@@ -70,7 +71,7 @@ To set up the application, you need to configure the following settings in a `.e
 - **CLIENT_ID**: The client ID generated in your Domo developer account. This is used to authenticate API requests and must be kept secure.
 - **CLIENT_SECRET**: The client secret associated with the `CLIENT_ID`. This acts as a password for API authentication. Never expose this value in client-side code or version control.
 - **EMBED_ID**: The unique identifier of the dashboard or card you want to embed. You can find this in the Domo platform when configuring your embed.
-- **EMBED_TYPE**: Specifies the type of embed. Valid values include `dashboard`, `card`, or `page`. Ensure this matches the type of content you are embedding.
+- **EMBED_TYPE**: Specifies the type of embed. Valid values are `dashboard`, `page`, `card` and `card-v1`. Ensure this matches the type of content you are embedding — a mismatch is the usual cause of a 404 inside the iframe. `card` selects **card embed v2**; use `card-v1` only if you specifically need the legacy renderer. See [Card embed v1 vs v2](#card-embed-v1-vs-v2).
 
 #### Optional Settings
 
@@ -110,6 +111,41 @@ To run and test the application, follow these steps:
    ```
 
 4. **Verify Embedding**: Ensure that the embedded dashboard or card is displayed correctly. If you encounter issues, check the `.env` configuration and server logs for errors.
+
+## Card embed v1 vs v2
+
+Dashboards have no v1/v2 split — `EMBED_TYPE=dashboard` (or `page`) is already served by the
+current-generation embed backend. Cards do, and this sample defaults to **v2**:
+
+| `EMBED_TYPE` | Render URL | Notes |
+|---|---|---|
+| `dashboard`, `page` | `https://public.domo.com/embed/pages/` | Default. No version split. |
+| `card`, `card-v2` | `https://public.domo.com/embed/cards/` | **Card embed v2** — recommended. |
+| `card-v1` | `https://public.domo.com/cards/` | Legacy card embed v1. |
+
+v2 is served by the same backend as dashboard embed, which is why it supports more than v1:
+
+| | v1 (`/cards/`) | v2 (`/embed/cards/`) |
+|---|---|---|
+| Card types | Chart and DomoApp only | Chart, DomoApp, plus Notebook/Text |
+| JS API events received | `/v1/onDrill`, `/v1/onFiltersChange`, `/v1/onFrameSizeChange` | the same, plus `/v1/onAppData` and `/v1/onAppReady` |
+| JS API methods you can call | `/v1/filters/apply` | the same, plus `/v1/appData/apply` |
+| Appearance parameters | — | `backgroundColor`, `scaleLineColor`, `textColor` |
+| Card image endpoint | `GET /cards/{id}.png` | no drop-in equivalent |
+
+The `public/jsapi.js` example in this repo uses only the events both versions support, so it
+works either way.
+
+### Things that trip people up
+
+- **The embed-token endpoint does not select the version.** Domo resolves the content type
+  from the embed id itself, so `/v1/cards/embed/auth` is correct for v1 and v2 alike — only
+  the render URL differs. (`/v1/dashboards/embed/auth` is likewise an alias for
+  `/v1/stories/embed/auth`; "stories" is legacy terminology.)
+- **The JS API silently does nothing unless embed authorized domains are configured** for
+  your instance. Add `?debug-js-api` to the embed URL to log why it did not initialise.
+- **An unrecognised `EMBED_TYPE` now throws at startup** instead of quietly falling back to
+  a dashboard.
 
 ## Documentation and Resources
 

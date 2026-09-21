@@ -29,7 +29,7 @@ npm start
 Required `.env` file (copy from `.env.example`):
 - `CLIENT_ID` / `CLIENT_SECRET`: Domo OAuth credentials from developer account
 - `EMBED_ID`: Dashboard/card/page ID to embed
-- `EMBED_TYPE`: One of `dashboard`, `card`, or `page`
+- `EMBED_TYPE`: One of `dashboard`, `page`, `card` (card embed **v2**), or `card-v1` (legacy card embed v1). Resolved in `constants.js`, which throws on an unrecognised value rather than falling back to a dashboard.
 
 Optional settings:
 - `USE_XHR=true`: Switches from standard iframe to XHR-based embedding (serves `sample_xhr.html` instead of `sample.html`)
@@ -49,7 +49,7 @@ Optional settings:
 **Server Layer**:
 - `express.js`: Main Express server, routes, session management, authentication middleware
 - `embed.js`: Token lifecycle management (OAuth access tokens + embed tokens with caching)
-- `constants.js`: Domo API endpoint definitions
+- `constants.js`: Domo API endpoint definitions, and the `EMBED_TYPE` -> token/render URL mapping (including the card v1 vs v2 choice)
 - `users.js`: Hardcoded user database with per-user embed configs and filter rules
 
 **Client Layer**:
@@ -69,6 +69,10 @@ Optional settings:
 2. **getEmbedToken()** (embed.js)
    - Uses access_token from step 1
    - Calls: `/v1/stories/embed/auth` (dashboard) or `/v1/cards/embed/auth` (card)
+   - The endpoint does **not** select the card version — Domo resolves the entity type
+     from the embed id, so the card endpoint serves both v1 and v2. Only the render URL
+     differs: `/embed/cards/{id}` is v2, `/cards/{id}` is v1.
+   - `/v1/dashboards/embed/auth` is an alias for `/v1/stories/embed/auth`
    - Payload includes: sessionLength, filters, policies, datasetRedirects
    - Returns: JWT embed token (cached with 60-second expiration buffer)
 
@@ -84,6 +88,13 @@ Optional settings:
 - `/v1/onDrill`: User drills into data → receives filters array
 - `/v1/onFiltersChange`: Dashboard filters changed → receives filters array
 - `/v1/onFrameSizeChange`: Iframe dimensions change → receives width/height
+
+**Version note**: card embed v1 exposes only `/v1/onDrill`, `/v1/onFiltersChange`,
+`/v1/onFrameSizeChange` and `/v1/filters/apply`. Card v2 and dashboard embed add
+`/v1/onAppData`, `/v1/onAppReady` and `/v1/appData/apply`. `jsapi.js` here uses only the
+shared subset, so it works on either version. Note also that the JS API does not initialise
+at all unless embed authorized domains are configured for the instance — append
+`?debug-js-api` to the embed URL to see why it bailed.
 
 **Filter Application** (sent to Domo):
 - Method: `/v1/filters/apply`
