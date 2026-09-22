@@ -45,6 +45,7 @@ Follow these steps to set up the project:
    CLIENT_ID=YOUR_CLIENT_ID
    CLIENT_SECRET=YOUR_CLIENT_SECRET
    EMBED_ID=YOUR_EMBED_ID
+   # dashboard | page | card (card embed v2) | card-v1 (legacy)
    EMBED_TYPE=dashboard
 
    # Optional settings
@@ -70,7 +71,7 @@ To set up the application, you need to configure the following settings in a `.e
 - **CLIENT_ID**: The client ID generated in your Domo developer account. This is used to authenticate API requests and must be kept secure.
 - **CLIENT_SECRET**: The client secret associated with the `CLIENT_ID`. This acts as a password for API authentication. Never expose this value in client-side code or version control.
 - **EMBED_ID**: The unique identifier of the dashboard or card you want to embed. You can find this in the Domo platform when configuring your embed.
-- **EMBED_TYPE**: Specifies the type of embed. Valid values include `dashboard`, `card`, or `page`. Ensure this matches the type of content you are embedding.
+- **EMBED_TYPE**: Which embed surface to use. Valid values are `dashboard`, `card`, `card-v1` and `app-studio`. Must match the kind of content `EMBED_ID` names — a mismatch is the usual cause of a 404 inside the iframe. `card` selects **card embed v2**; use `card-v1` only if you specifically need the legacy renderer. See [Embed surfaces and card v1 vs v2](#embed-surfaces-and-card-v1-vs-v2).
 
 #### Optional Settings
 
@@ -110,6 +111,63 @@ To run and test the application, follow these steps:
    ```
 
 4. **Verify Embedding**: Ensure that the embedded dashboard or card is displayed correctly. If you encounter issues, check the `.env` configuration and server logs for errors.
+
+## Embed surfaces and card v1 vs v2
+
+| `EMBED_TYPE` | Render URL | Surface |
+|---|---|---|
+| `dashboard` | `https://public.domo.com/embed/entities/` | A dashboard. Default. |
+| `card` | `https://public.domo.com/embed/entities/` | A single card, **v2** — recommended. |
+| `app-studio` | `https://public.domo.com/embed/entities/` | An App Studio app. |
+| `card-v1` | `https://public.domo.com/cards/` | A single card, legacy v1. |
+
+**One render URL covers everything except card v1.** The path does not select the surface —
+the embed id does. `/embed/entities/` is handled by an endpoint that looks up the id and
+renders whatever it points at, so the same URL serves dashboards, cards and App Studio apps.
+The practical consequence is that a 404 almost always means the *id* is wrong or the content
+is not shared, not that the path is wrong.
+
+`/embed/pages/`, `/embed/cards/`, `/embed/dashboards/` and `/embed/app-studio/` are aliases
+of that same endpoint and all still work. They are what Domo's own embed dialog currently
+hands out, so use them instead if you want the sample to match the URL you see in the
+product — note that an App Studio app is handed out under `/embed/pages/`, not
+`/embed/app-studio/`, which is a good illustration of why the path is not a reliable
+indicator of the surface.
+
+**Card v1 is the one genuine exception** and keeps `/cards/`. It is a different renderer, not
+an alias, so it cannot be served from `/embed/entities/` — that path always renders the
+current card experience.
+
+**"Dashboard" and "page" are the same surface**, so there is only one type for it:
+`dashboard`. (`page` is still accepted as a deprecated alias, as is `card-v2` for `card`, but
+prefer the values above.)
+
+Only cards have a v1/v2 split, and this sample defaults to **v2**:
+
+v2 is served by the same backend as dashboard embed, which is why it supports more than v1:
+
+| | v1 (`/cards/`) | v2 (`/embed/cards/`) |
+|---|---|---|
+| Card types | Chart and DomoApp only | Chart, DomoApp, plus Notebook/Text |
+| JS API events received | `/v1/onDrill`, `/v1/onFiltersChange`, `/v1/onFrameSizeChange` | the same, plus `/v1/onAppData` and `/v1/onAppReady` |
+| JS API methods you can call | `/v1/filters/apply` | the same, plus `/v1/appData/apply` |
+| Appearance parameters | — | `backgroundColor`, `scaleLineColor`, `textColor` |
+| Card image endpoint | `GET /cards/{id}.png` | no drop-in equivalent |
+
+The `public/jsapi.js` example in this repo uses only the events both versions support, so it
+works either way.
+
+### Things that trip people up
+
+- **The embed-token endpoint does not select the surface or the version.** Domo resolves the
+  entity type from the embed id itself, so either token endpoint mints a working token for
+  dashboards, cards (v1 and v2) and App Studio apps alike — only the render URL differs.
+  (`/v1/dashboards/embed/auth` is an alias for `/v1/stories/embed/auth`; "stories" is legacy
+  terminology.)
+- **The JS API silently does nothing unless embed authorized domains are configured** for
+  your instance. Add `?debug-js-api` to the embed URL to log why it did not initialise.
+- **An unrecognised `EMBED_TYPE` now throws at startup** instead of quietly falling back to
+  a dashboard, which is what any unmatched value used to do.
 
 ## Documentation and Resources
 
