@@ -125,9 +125,18 @@ To run and test the application, follow these steps:
 `dashboard`. The render URL says `pages` for historical reasons only. (`page` is still
 accepted as a deprecated alias, as is `card-v2` for `card`, but prefer the values above.)
 
-**An App Studio app is not a dashboard.** It is a distinct surface with its own app shell,
-its own page tabs, and its own backend controller, so it gets its own type and its own
-render URL.
+**An App Studio app is not a dashboard.** It is a distinct surface with its own app shell
+and its own page tabs, so it gets its own type here. Note though that when you copy an embed
+URL for an App Studio app out of Domo, you will get an `/embed/pages/` URL rather than
+`/embed/app-studio/`. Both reach the same content — see the note below on why the path is
+not what selects the surface.
+
+**The path does not select the surface; the embed id does.** All of the `/embed/...` paths
+above are handled by the same endpoint, which looks up the embed id and renders whatever that
+id points at. That is why an App Studio app works under `/embed/pages/`, and why using the
+"wrong" one of these paths for a given id still renders correctly. The practical consequence
+is that a 404 almost always means the *id* is wrong or the content is not shared, not that
+the path is wrong.
 
 Only cards have a v1/v2 split, and this sample defaults to **v2**:
 

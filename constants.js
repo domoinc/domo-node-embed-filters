@@ -22,8 +22,7 @@ const EMBED_TOKEN_URL_CARD = `${API_HOST}/v1/cards/embed/auth`;
 const EMBED_URL_DASHBOARD = `${EMBED_HOST}/embed/pages/`;
 
 // App Studio app embed. A genuinely different surface from a dashboard: its own
-// app shell, its own page tabs, and its own backend controller. Not a dashboard
-// with extra chrome.
+// app shell and its own page tabs. Not a dashboard with extra chrome.
 const EMBED_URL_APP_STUDIO = `${EMBED_HOST}/embed/app-studio/`;
 
 // Card embed v2 -- the default for cards. Served by the same backend as
