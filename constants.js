@@ -16,45 +16,36 @@ const EMBED_TOKEN_URL_CARD = `${API_HOST}/v1/cards/embed/auth`;
 
 // Render URLs -- the generated form POSTs the embed token to one of these.
 
-// Dashboard embed. "Dashboard" and "page" are the same surface -- the URL says
-// `pages` for historical reasons only. There is no v1/v2 split here; this is
-// already served by the current-generation embed backend.
-const EMBED_URL_DASHBOARD = `${EMBED_HOST}/embed/pages/`;
+// Every surface except card embed v1 is served by a single endpoint that resolves
+// the entity type from the embed id, so dashboards, cards (v2) and App Studio apps
+// all share one render URL. The `pages`, `cards`, `dashboards` and `app-studio`
+// paths are aliases of this same endpoint and are what Domo's own embed dialog
+// currently hands out; they continue to work if you prefer to match it.
+const EMBED_URL_ENTITIES = `${EMBED_HOST}/embed/entities/`;
 
-// App Studio app embed. A genuinely different surface from a dashboard: its own
-// app shell and its own page tabs. Not a dashboard with extra chrome.
-const EMBED_URL_APP_STUDIO = `${EMBED_HOST}/embed/app-studio/`;
-
-// Card embed v2 -- the default for cards. Served by the same backend as
-// dashboard embed, so it supports more card types (Notebook/Text in addition to
-// chart and DomoApp) and the full JS API, including /v1/onAppData,
-// /v1/onAppReady and /v1/appData/apply.
-const EMBED_URL_CARD_V2 = `${EMBED_HOST}/embed/cards/`;
-
-// Card embed v1 -- legacy, kept for existing integrations. Served by the older
-// renderer: chart and DomoApp cards only, and the JS API is limited to
-// /v1/onDrill, /v1/onFiltersChange, /v1/onFrameSizeChange and
-// /v1/filters/apply. Prefer v2 for anything new.
+// Card embed v1 -- legacy, kept for existing integrations. This is the one surface
+// that genuinely needs its own path: it is a different renderer, handling chart and
+// DomoApp cards only, with a JS API limited to /v1/onDrill, /v1/onFiltersChange,
+// /v1/onFrameSizeChange and /v1/filters/apply. It cannot be served from
+// /embed/entities/, which always renders the current card experience.
 const EMBED_URL_CARD_V1 = `${EMBED_HOST}/cards/`;
 
 const EMBED_TYPE = (process.env.EMBED_TYPE || 'dashboard').toLowerCase();
 
 let EMBED_TOKEN_URL = EMBED_TOKEN_URL_DASHBOARD;
-let EMBED_URL = EMBED_URL_DASHBOARD;
+let EMBED_URL = EMBED_URL_ENTITIES;
 
 switch (EMBED_TYPE) {
     // 'card' means v2. Use 'card-v1' to opt back in to the legacy renderer.
     case 'card':
     case 'card-v2':
         EMBED_TOKEN_URL = EMBED_TOKEN_URL_CARD;
-        EMBED_URL = EMBED_URL_CARD_V2;
         break;
     case 'card-v1':
         EMBED_TOKEN_URL = EMBED_TOKEN_URL_CARD;
         EMBED_URL = EMBED_URL_CARD_V1;
         break;
     case 'app-studio':
-        EMBED_URL = EMBED_URL_APP_STUDIO;
         break;
     // 'page' is a deprecated alias -- a dashboard and a page are the same
     // surface, so there is only one type for it. Prefer 'dashboard'.
